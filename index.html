@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Treino Toji">
+<link rel="apple-touch-icon" href="https://i.pinimg.com/736x/2b/4f/17/2b4f1799b441e05254a12d6e56c9e1ad.jpg">
+<link rel="icon" href="https://i.pinimg.com/736x/2b/4f/17/2b4f1799b441e05254a12d6e56c9e1ad.jpg">
+<title>Treino Toji</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0a;--sf:#141414;--sf2:#1c1c1c;--bd:#2a2a2a;--ac:#c8a96e;--ac2:#e8c98e;--tx:#f0ede8;--mu:#888;--gn:#5a9e78;--rd:#c85a3a;--pu:#7f77dd;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;overscroll-behavior:none;}
+
+/* NAV */
+.nav{display:flex;background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;}
+.nav-tab{flex:1;padding:11px 4px;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);text-align:center;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.nav-tab.active{color:var(--ac);border-bottom-color:var(--ac);}
+
+.scr{display:none;}
+.scr.active{display:block;}
+.pb{padding-bottom:20px;}
+
+/* ===== XP / LEVEL HEADER ===== */
+.xp-bar{background:var(--sf);border-bottom:1px solid var(--bd);padding:14px 16px;}
+.xp-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.xp-level{display:flex;align-items:center;gap:10px;}
+.xp-badge{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:#0a0800;flex-shrink:0;}
+.xp-info{}
+.xp-lvl-txt{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--tx);line-height:1;}
+.xp-name{font-size:11px;color:var(--mu);margin-top:1px;}
+.xp-right{text-align:right;}
+.xp-pts{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--ac);line-height:1;}
+.xp-next{font-size:11px;color:var(--mu);}
+.xp-track{height:6px;background:var(--bd);border-radius:6px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:6px;transition:width .4s ease;}
+.xp-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-top:4px;}
+.streak-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(200,169,110,.12);border:1px solid rgba(200,169,110,.25);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;color:var(--ac);}
+
+/* ===== MOTIVATION ===== */
+.moti{position:relative;margin:12px 14px;border-radius:14px;overflow:hidden;border:1px solid var(--bd);}
+.moti-img{width:100%;height:200px;object-fit:cover;object-position:center top;display:block;filter:brightness(.7);}
+.moti-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.95) 0%,rgba(10,10,10,.2) 60%,transparent 100%);}
+.moti-text{position:absolute;bottom:0;left:0;right:0;padding:16px;}
+.moti-quote{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em;color:var(--tx);line-height:1.15;}
+.moti-sub{font-size:11px;color:var(--mu);margin-top:4px;}
+
+/* ===== WEEK NAV ===== */
+.wknav{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:10px 14px;background:var(--sf);border-bottom:1px solid var(--bd);}
+.wd{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:8px;cursor:pointer;transition:background .15s;position:relative;}
+.wd.active{background:var(--ac);}
+.wd.off{opacity:.35;}
+.wd-lbl{font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--mu);}
+.wd.active .wd-lbl{color:#1a1200;}
+.wd-dot{width:5px;height:5px;border-radius:50%;background:var(--bd);}
+.wd.tr .wd-dot{background:var(--ac);}
+.wd.co .wd-dot{background:var(--gn);}
+.wd.active .wd-dot{background:#1a1200!important;}
+.wd-done{position:absolute;top:3px;right:3px;font-size:9px;}
+
+/* ===== DAY ===== */
+.day{display:none;}
+.day.active{display:block;}
+.dhero{padding:16px 20px 12px;border-bottom:1px solid var(--bd);}
+.dtag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:8px;}
+.tf{background:rgba(200,169,110,.15);color:var(--ac);border:1px solid rgba(200,169,110,.3);}
+.tc{background:rgba(90,158,120,.15);color:var(--gn);border:1px solid rgba(90,158,120,.3);}
+.tfn{background:rgba(200,90,58,.1);color:#e07a5f;border:1px solid rgba(200,90,58,.25);}
+.to{background:rgba(100,100,100,.1);color:var(--mu);border:1px solid var(--bd);}
+.dname{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.03em;line-height:1;color:var(--tx);}
+.ddesc{font-size:13px;color:var(--mu);margin-top:3px;font-weight:300;}
+.xp-reward{display:inline-flex;align-items:center;gap:5px;margin-top:6px;background:rgba(200,169,110,.1);border:1px solid rgba(200,169,110,.25);border-radius:8px;padding:4px 10px;font-size:12px;color:var(--ac);font-weight:500;}
+
+/* STATS ROW */
+.srow{display:flex;border-bottom:1px solid var(--bd);}
+.si{flex:1;padding:10px 12px;border-right:1px solid var(--bd);}
+.si:last-child{border-right:none;}
+.sv{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--ac);line-height:1;}
+.sl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+
+/* PROGRESS */
+.pw{padding:10px 14px 0;}
+.pl{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-bottom:5px;}
+.pb2{height:3px;background:var(--bd);border-radius:3px;overflow:hidden;}
+.pf{height:100%;background:var(--gn);border-radius:3px;transition:width .3s;width:0%;}
+
+/* SECTION HEAD */
+.sh{padding:12px 20px 8px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.1em;font-weight:500;}
+
+/* WARMUP */
+.wb{margin:10px 14px 0;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+.wt{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;cursor:pointer;}
+.wt.open{border-bottom:1px solid var(--bd);}
+.wlbl{font-size:11px;font-weight:500;color:var(--ac);text-transform:uppercase;letter-spacing:.08em;}
+.wtime{font-size:11px;color:var(--mu);}
+.warr{font-size:11px;color:var(--mu);transition:transform .2s;}
+.wt.open .warr{transform:rotate(180deg);}
+.wbody{display:none;padding:8px 15px;flex-direction:column;gap:4px;}
+.wbody.open{display:flex;}
+.wr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--bd);}
+.wr:last-child{border-bottom:none;}
+.wex{font-size:13px;color:var(--tx);}
+.wsets{font-size:12px;color:var(--mu);font-weight:300;}
+
+/* EXERCISE */
+.exlist{padding:0 14px;display:flex;flex-direction:column;gap:7px;}
+.exc{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;transition:border-color .15s,background .15s;position:relative;overflow:hidden;}
+.exc.done{border-color:var(--gn);background:rgba(90,158,120,.06);}
+.exc.done::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gn);}
+.exi{flex:1;min-width:0;}
+.exn{font-size:14px;font-weight:500;color:var(--tx);line-height:1.2;}
+.exc.done .exn{color:var(--mu);text-decoration:line-through;text-decoration-color:var(--gn);}
+.exno{font-size:12px;color:var(--mu);margin-top:3px;font-weight:300;}
+.exbdg{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:5px 9px;font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--ac);white-space:nowrap;flex-shrink:0;}
+.exc.done .exbdg{color:var(--gn);border-color:rgba(90,158,120,.3);}
+
+/* TIP */
+.tip{margin:10px 14px 0;padding:11px 15px;background:var(--sf);border-left:2px solid var(--ac);border-radius:0 8px 8px 0;font-size:13px;color:var(--mu);line-height:1.6;font-weight:300;}
+.tip strong{color:var(--ac);font-weight:500;}
+
+/* REST */
+.rest{padding:40px 20px;text-align:center;}
+.ri{font-size:44px;margin-bottom:14px;opacity:.4;}
+.rtt{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--mu);}
+.rtx{font-size:14px;color:var(--mu);margin-top:8px;line-height:1.6;font-weight:300;max-width:260px;margin-left:auto;margin-right:auto;}
+
+/* COMPLETE BUTTON */
+.day-complete-btn{margin:14px 14px 0;width:calc(100% - 28px);padding:14px;border-radius:12px;border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;}
+.day-complete-btn.ready{background:var(--ac);color:#0a0800;}
+.day-complete-btn.ready:active{background:var(--ac2);transform:scale(.98);}
+.day-complete-btn.locked{background:var(--sf);color:var(--mu);border:1px solid var(--bd);}
+.day-complete-btn.completed{background:rgba(90,158,120,.15);color:var(--gn);border:1px solid rgba(90,158,120,.3);}
+
+/* TOAST */
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--ac);color:#0a0800;padding:10px 20px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;transition:all .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.bad{background:var(--rd);color:#fff;}
+
+/* ===== NÍVEL SCREEN ===== */
+.level-hero{padding:24px 20px 20px;text-align:center;border-bottom:1px solid var(--bd);}
+.level-big-badge{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:40px;color:#0a0800;margin:0 auto 12px;}
+.level-big-name{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--tx);letter-spacing:.04em;}
+.level-big-sub{font-size:13px;color:var(--mu);margin-top:4px;font-weight:300;}
+.level-xp-wrap{margin:14px 20px 0;}
+.level-xp-track{height:10px;background:var(--bd);border-radius:10px;overflow:hidden;margin:6px 0;}
+.level-xp-fill{height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:10px;transition:width .5s ease;}
+.level-xp-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);}
+
+/* LEVELS LIST */
+.levels-list{padding:14px;}
+.lvl-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;margin-bottom:8px;}
+.lvl-row.current{border-color:var(--ac);}
+.lvl-row.unlocked{opacity:.5;}
+.lvl-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;flex-shrink:0;}
+.lvl-icon.done{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#0a0800;}
+.lvl-icon.curr{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#0a0800;}
+.lvl-icon.lock{background:var(--sf2);color:var(--mu);border:1px solid var(--bd);}
+.lvl-info{flex:1;}
+.lvl-name{font-size:14px;font-weight:500;color:var(--tx);}
+.lvl-xp{font-size:12px;color:var(--mu);margin-top:2px;}
+.lvl-tag{font-size:10px;padding:2px 8px;border-radius:10px;}
+.lvl-tag.curr-tag{background:rgba(200,169,110,.15);color:var(--ac);border:1px solid rgba(200,169,110,.3);}
+.lvl-tag.done-tag{background:rgba(90,158,120,.15);color:var(--gn);}
+.lvl-tag.lock-tag{background:var(--sf2);color:var(--mu);}
+
+/* ===== STREAK CALENDAR ===== */
+.cal-section{padding:14px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-title{font-size:13px;font-weight:500;color:var(--tx);}
+.cal-streak{display:flex;align-items:center;gap:6px;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--ac);}
+.cal-streak-lbl{font-size:11px;color:var(--mu);font-family:'DM Sans',sans-serif;font-weight:400;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-lbl{font-size:9px;color:var(--mu);text-align:center;padding:2px 0;text-transform:uppercase;letter-spacing:.04em;}
+.cal-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--mu);}
+.cal-cell.empty{background:transparent;}
+.cal-cell.future{background:var(--sf2);color:var(--bd);}
+.cal-cell.missed{background:rgba(200,90,58,.15);color:#e07a5f;border:1px solid rgba(200,90,58,.2);}
+.cal-cell.done{background:rgba(90,158,120,.2);color:var(--gn);border:1px solid rgba(90,158,120,.3);}
+.cal-cell.rest{background:var(--sf);color:var(--mu);border:1px solid var(--bd);}
+.cal-cell.today{outline:2px solid var(--ac);outline-offset:1px;}
+
+/* ===== DIETA ===== */
+.nhero{padding:16px 20px 12px;border-bottom:1px solid var(--bd);}
+.ntag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:8px;background:rgba(90,158,120,.15);color:var(--gn);border:1px solid rgba(90,158,120,.3);}
+.ntitle{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--tx);line-height:1;}
+.nsub{font-size:13px;color:var(--mu);margin-top:3px;font-weight:300;}
+.mstrip{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--bd);}
+.mc{padding:10px 6px;text-align:center;border-right:1px solid var(--bd);}
+.mc:last-child{border-right:none;}
+.mv{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--ac);line-height:1;}
+.ml{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.dtr{display:flex;gap:6px;padding:10px 14px 4px;}
+.dtg{flex:1;padding:7px 4px;border-radius:10px;border:1px solid var(--bd);font-size:11px;font-weight:500;color:var(--mu);cursor:pointer;background:transparent;text-align:center;transition:all .15s;}
+.dtg.active{background:var(--ac);color:#0a0800;border-color:var(--ac);}
+.mplan{display:none;padding:0 14px;flex-direction:column;gap:8px;}
+.mplan.active{display:flex;}
+.mcard{background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--bd);}
+.mtime{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.mname{font-size:13px;font-weight:500;color:var(--tx);}
+.mkcal{font-family:'Bebas Neue',sans-serif;font-size:19px;color:var(--ac);line-height:1;text-align:right;}
+.mkcall{font-size:9px;color:var(--mu);text-transform:uppercase;text-align:right;}
+.mbody{padding:8px 14px;}
+.mrow{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--bd);}
+.mrow:last-child{border-bottom:none;}
+.mfood{font-size:13px;color:var(--tx);}
+.mqty{font-size:12px;color:var(--mu);font-weight:300;}
+.mmac{display:flex;gap:10px;padding:7px 14px;background:var(--sf2);}
+.mm{font-size:11px;color:var(--mu);}
+.mm span{color:var(--ac);font-weight:500;}
+/* water */
+.ww{padding:0 14px;}
+.wcard{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:13px;}
+.wtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.wtitle{font-size:13px;font-weight:500;color:var(--tx);}
+.wsub{font-size:11px;color:var(--mu);margin-top:2px;}
+.wnum{font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--gn);line-height:1;text-align:right;}
+.wgoal{font-size:11px;color:var(--mu);text-align:right;}
+.wcups{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.wcup{width:32px;height:32px;border-radius:7px;border:1px solid var(--bd);background:var(--sf2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.wcup.filled{background:rgba(90,158,120,.2);border-color:var(--gn);}
+.wbar2{height:3px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.wfill{height:100%;background:var(--gn);border-radius:4px;transition:width .3s;}
+/* avoid */
+.avg{padding:0 14px;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.acard{background:var(--sf);border:1px solid rgba(200,90,58,.25);border-radius:10px;padding:9px 11px;}
+.aname{font-size:12px;font-weight:500;color:#e07a5f;}
+.awhy{font-size:11px;color:var(--mu);margin-top:2px;line-height:1.4;font-weight:300;}
+/* rules */
+.slist{padding:0 14px;display:flex;flex-direction:column;gap:6px;}
+.scard{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.sname{font-size:13px;font-weight:500;color:var(--tx);}
+.swhen{font-size:11px;color:var(--mu);margin-top:2px;font-weight:300;}
+.sdose{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--ac);white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="goTab('treino')">Treino</div>
+  <div class="nav-tab" onclick="goTab('nivel')">Nível</div>
+  <div class="nav-tab" onclick="goTab('dieta')">Dieta</div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- ========== TREINO ========== -->
+<div class="scr active" id="scr-treino">
+
+  <!-- XP Bar -->
+  <div class="xp-bar">
+    <div class="xp-top">
+      <div class="xp-level">
+        <div class="xp-badge" id="xp-badge-num">1</div>
+        <div class="xp-info">
+          <div class="xp-lvl-txt" id="xp-lvl-txt">Nível 1</div>
+          <div class="xp-name" id="xp-lvl-name">Iniciante</div>
+        </div>
+      </div>
+      <div class="xp-right">
+        <div class="xp-pts"><span id="xp-cur">0</span> XP</div>
+        <div class="xp-next">próximo: <span id="xp-nxt">1000</span></div>
+      </div>
+    </div>
+    <div class="xp-track"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+    <div class="xp-labels"><span id="xp-l0">0</span><span id="xp-l1">1000 XP</span></div>
+  </div>
+
+  <!-- Motivation image -->
+  <div class="moti">
+    <img class="moti-img" src="https://i.pinimg.com/736x/2b/4f/17/2b4f1799b441e05254a12d6e56c9e1ad.jpg" alt="Toji" onerror="this.parentElement.style.display='none'">
+    <div class="moti-overlay"></div>
+    <div class="moti-text">
+      <div class="moti-quote">"Não existe talento.<br>Só existe quanto você aguenta."</div>
+      <div class="moti-sub">— Toji Fushiguro</div>
+    </div>
+  </div>
+
+  <!-- Streak -->
+  <div style="padding:10px 14px 4px;display:flex;align-items:center;justify-content:space-between;">
+    <div class="streak-pill">🔥 <span id="streak-num">0</span> dias seguidos</div>
+    <div style="font-size:11px;color:var(--mu);" id="week-xp-label">Esta semana: 0 XP</div>
+  </div>
+
+  <!-- Week nav -->
+  <div class="wknav">
+    <div class="wd tr active" onclick="selDay(0)" id="wd-0"><div class="wd-lbl">SEG</div><div class="wd-dot"></div><div class="wd-done" id="wdd-0"></div></div>
+    <div class="wd tr" onclick="selDay(1)" id="wd-1"><div class="wd-lbl">TER</div><div class="wd-dot"></div><div class="wd-done" id="wdd-1"></div></div>
+    <div class="wd co" onclick="selDay(2)" id="wd-2"><div class="wd-lbl">QUA</div><div class="wd-dot"></div><div class="wd-done" id="wdd-2"></div></div>
+    <div class="wd tr" onclick="selDay(3)" id="wd-3"><div class="wd-lbl">QUI</div><div class="wd-dot"></div><div class="wd-done" id="wdd-3"></div></div>
+    <div class="wd tr" onclick="selDay(4)" id="wd-4"><div class="wd-lbl">SEX</div><div class="wd-dot"></div><div class="wd-done" id="wdd-4"></div></div>
+    <div class="wd off" onclick="selDay(5)" id="wd-5"><div class="wd-lbl">SÁB</div><div class="wd-dot"></div></div>
+    <div class="wd off" onclick="selDay(6)" id="wd-6"><div class="wd-lbl">DOM</div><div class="wd-dot"></div></div>
+  </div>
+
+  <div class="pb">
+
+  <!-- SEG -->
+  <div class="day active" id="day-0">
+    <div class="dhero"><div class="dtag tf">força</div><div class="dname">Peito + Tríceps</div><div class="ddesc">Força base com tensão constante</div><div class="xp-reward">+200 XP ao completar</div></div>
+    <div class="srow"><div class="si"><div class="sv">6</div><div class="sl">exercícios</div></div><div class="si"><div class="sv">~60</div><div class="sl">minutos</div></div><div class="si"><div class="sv">+HIIT</div><div class="sl">finalizador</div></div></div>
+    <div class="pw"><div class="pl"><span>Progresso</span><span id="pr-0">0/6</span></div><div class="pb2"><div class="pf" id="pf-0"></div></div></div>
+    <div class="wb"><div class="wt" onclick="togWarm(this)"><span class="wlbl">🔥 Aquecimento — 8 min</span><span class="warr">▼</span></div><div class="wbody"><div class="wr"><span class="wex">Rotação de ombros</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Arm circles amplos</span><span class="wsets">2×20</span></div><div class="wr"><span class="wex">Flexão de braço leve</span><span class="wsets">2×12</span></div><div class="wr"><span class="wex">Supino leve (50% da carga)</span><span class="wsets">1×15</span></div><div class="wr"><span class="wex">Band pull-apart ou toalha</span><span class="wsets">2×15</span></div></div></div>
+    <div class="sh">Exercícios — toque para marcar</div>
+    <div class="exlist" id="lst-0">
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Supino reto com barra</div><div class="exno">Foco em carga</div></div><div class="exbdg">4×5–6</div></div>
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Supino inclinado com halteres</div><div class="exno">3s excêntrico na descida</div></div><div class="exbdg">3×10</div></div>
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Crossover no cabo</div><div class="exno">Baixo para cima — feixe esternal</div></div><div class="exbdg">3×15</div></div>
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Mergulho no paralelo</div><div class="exno">Adicionar peso quando dominar</div></div><div class="exbdg">3×falha</div></div>
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Tríceps pulley (corda)</div><div class="exno">Abre a corda no final</div></div><div class="exbdg">3×12</div></div>
+      <div class="exc" onclick="togEx(this,'0')"><div class="exi"><div class="exn">Bike / corda naval</div><div class="exno">HIIT — 30s forte / 30s fraco</div></div><div class="exbdg">10min</div></div>
+    </div>
+    <button class="day-complete-btn locked" id="btn-0" onclick="completeDay(0)">Complete todos os exercícios primeiro</button>
+  </div>
+
+  <!-- TER -->
+  <div class="day" id="day-1">
+    <div class="dhero"><div class="dtag tf">força</div><div class="dname">Costas + Bíceps</div><div class="ddesc">Volume + abertura de costas</div><div class="xp-reward">+200 XP ao completar</div></div>
+    <div class="srow"><div class="si"><div class="sv">6</div><div class="sl">exercícios</div></div><div class="si"><div class="sv">~65</div><div class="sl">minutos</div></div><div class="si"><div class="sv">V-taper</div><div class="sl">objetivo</div></div></div>
+    <div class="pw"><div class="pl"><span>Progresso</span><span id="pr-1">0/6</span></div><div class="pb2"><div class="pf" id="pf-1"></div></div></div>
+    <div class="wb"><div class="wt" onclick="togWarm(this)"><span class="wlbl">🔥 Aquecimento — 8 min</span><span class="warr">▼</span></div><div class="wbody"><div class="wr"><span class="wex">Rotação de escápula</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Hang passivo na barra</span><span class="wsets">2×20s</span></div><div class="wr"><span class="wex">Barra fixa — negativa lenta</span><span class="wsets">2×5</span></div><div class="wr"><span class="wex">Remada leve no cabo</span><span class="wsets">1×15</span></div><div class="wr"><span class="wex">Mobilidade de quadril</span><span class="wsets">10 cada</span></div></div></div>
+    <div class="sh">Exercícios</div>
+    <div class="exlist" id="lst-1">
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Barra fixa (pronada larga)</div><div class="exno">Exercício mais importante da semana</div></div><div class="exbdg">4×máx</div></div>
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Remada curvada com barra</div><div class="exno">Costas neutras, cotovelo rente</div></div><div class="exbdg">4×6–8</div></div>
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Puxada frente (pegada neutra)</div><div class="exno">Amplitude total, sem balanço</div></div><div class="exbdg">3×12</div></div>
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Remada unilateral com halter</div></div><div class="exbdg">3×10</div></div>
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Rosca direta barra W</div><div class="exno">Sem balançar o tronco</div></div><div class="exbdg">3×10</div></div>
+      <div class="exc" onclick="togEx(this,'1')"><div class="exi"><div class="exn">Rosca martelo alternada</div></div><div class="exbdg">3×12</div></div>
+    </div>
+    <div class="tip"><strong>Dica:</strong> Barra fixa acima de tudo — abre as costas e cria o V-taper.</div>
+    <button class="day-complete-btn locked" id="btn-1" onclick="completeDay(1)">Complete todos os exercícios primeiro</button>
+  </div>
+
+  <!-- QUA -->
+  <div class="day" id="day-2">
+    <div class="dhero"><div class="dtag tc">core + queima</div><div class="dname">Core + HIIT</div><div class="ddesc">Dia chave — atacar a gordura abdominal</div><div class="xp-reward">+200 XP ao completar</div></div>
+    <div class="srow"><div class="si"><div class="sv">7</div><div class="sl">exercícios</div></div><div class="si"><div class="sv">~55</div><div class="sl">minutos</div></div><div class="si"><div class="sv">HIIT</div><div class="sl">20min</div></div></div>
+    <div class="pw"><div class="pl"><span>Progresso</span><span id="pr-2">0/7</span></div><div class="pb2"><div class="pf" id="pf-2"></div></div></div>
+    <div class="wb"><div class="wt" onclick="togWarm(this)"><span class="wlbl">🔥 Aquecimento — 6 min</span><span class="warr">▼</span></div><div class="wbody"><div class="wr"><span class="wex">Rotação de quadril em pé</span><span class="wsets">2×20</span></div><div class="wr"><span class="wex">Cat-cow (mobilidade lombar)</span><span class="wsets">2×10</span></div><div class="wr"><span class="wex">Dead bug lento</span><span class="wsets">2×8 cada</span></div><div class="wr"><span class="wex">Prancha estática</span><span class="wsets">1×30s</span></div></div></div>
+    <div class="sh">Core funcional</div>
+    <div class="exlist" id="lst-2">
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Hollow body hold</div><div class="exno">Achata a barriga de dentro para fora</div></div><div class="exbdg">4×30s</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Ab wheel (roda)</div><div class="exno">Sem hiperlordose na extensão</div></div><div class="exbdg">3×10</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Dragon flag</div><div class="exno">Começa com pernas dobradas</div></div><div class="exbdg">3×6–8</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Hanging leg raise (barra)</div><div class="exno">Infra do abdômen + quadril posterior</div></div><div class="exbdg">3×12</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Prancha com rotação de quadril</div><div class="exno">Oblíquos — define a cintura</div></div><div class="exbdg">3×20</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Vacum abdominal</div><div class="exno">Em jejum — treina o transverso</div></div><div class="exbdg">3×30s</div></div>
+      <div class="exc" onclick="togEx(this,'2')"><div class="exi"><div class="exn">Corrida / bike intervalada</div><div class="exno">40s forte / 20s leve — 10 rounds</div></div><div class="exbdg">20min</div></div>
+    </div>
+    <div class="tip"><strong>Vacum:</strong> Em jejum diariamente — sobe a barriga que cai.</div>
+    <button class="day-complete-btn locked" id="btn-2" onclick="completeDay(2)">Complete todos os exercícios primeiro</button>
+  </div>
+
+  <!-- QUI -->
+  <div class="day" id="day-3">
+    <div class="dhero"><div class="dtag tf">força</div><div class="dname">Ombros + Trapézio</div><div class="ddesc">Construir o V-taper do Toji</div><div class="xp-reward">+200 XP ao completar</div></div>
+    <div class="srow"><div class="si"><div class="sv">6</div><div class="sl">exercícios</div></div><div class="si"><div class="sv">~60</div><div class="sl">minutos</div></div><div class="si"><div class="sv">V-taper</div><div class="sl">foco</div></div></div>
+    <div class="pw"><div class="pl"><span>Progresso</span><span id="pr-3">0/6</span></div><div class="pb2"><div class="pf" id="pf-3"></div></div></div>
+    <div class="wb"><div class="wt" onclick="togWarm(this)"><span class="wlbl">🔥 Aquecimento — 8 min</span><span class="warr">▼</span></div><div class="wbody"><div class="wr"><span class="wex">Rotação interna/externa de ombro</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Elevação frontal bem leve</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Face pull leve</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Desenvolvimento barra vazia</span><span class="wsets">1×10</span></div><div class="wr"><span class="wex">Círculo de braço com haltere leve</span><span class="wsets">2×10</span></div></div></div>
+    <div class="sh">Exercícios</div>
+    <div class="exlist" id="lst-3">
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Desenvolvimento militar (barra)</div><div class="exno">Core contraído, sem hiperextender</div></div><div class="exbdg">4×6–8</div></div>
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Elevação lateral com halteres</div><div class="exno">Forma perfeita acima de carga</div></div><div class="exbdg">4×15</div></div>
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Elevação lateral no cabo</div><div class="exno">Tensão constante no deltoide</div></div><div class="exbdg">3×15</div></div>
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Crucifixo invertido no banco</div><div class="exno">Deltoide posterior — melhora postura</div></div><div class="exbdg">3×15</div></div>
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Face pull (corda)</div><div class="exno">Saúde do manguito rotador</div></div><div class="exbdg">3×20</div></div>
+      <div class="exc" onclick="togEx(this,'3')"><div class="exi"><div class="exn">Encolhimento com halteres</div></div><div class="exbdg">3×12</div></div>
+    </div>
+    <div class="tip"><strong>Dica:</strong> Deltoide posterior projeta os ombros pra trás — shape de lutador.</div>
+    <button class="day-complete-btn locked" id="btn-3" onclick="completeDay(3)">Complete todos os exercícios primeiro</button>
+  </div>
+
+  <!-- SEX -->
+  <div class="day" id="day-4">
+    <div class="dhero"><div class="dtag tfn">força + funcional</div><div class="dname">Pernas + Funcional</div><div class="ddesc">Base forte + queima calórica alta</div><div class="xp-reward">+200 XP ao completar</div></div>
+    <div class="srow"><div class="si"><div class="sv">6</div><div class="sl">exercícios</div></div><div class="si"><div class="sv">~65</div><div class="sl">minutos</div></div><div class="si"><div class="sv">+func</div><div class="sl">finalizador</div></div></div>
+    <div class="pw"><div class="pl"><span>Progresso</span><span id="pr-4">0/6</span></div><div class="pb2"><div class="pf" id="pf-4"></div></div></div>
+    <div class="wb"><div class="wt" onclick="togWarm(this)"><span class="wlbl">🔥 Aquecimento — 10 min</span><span class="warr">▼</span></div><div class="wbody"><div class="wr"><span class="wex">Polichinelo ou corda de pular</span><span class="wsets">2min</span></div><div class="wr"><span class="wex">Agachamento com peso corporal</span><span class="wsets">2×15</span></div><div class="wr"><span class="wex">Avanço lento sem peso</span><span class="wsets">2×10</span></div><div class="wr"><span class="wex">Mobilidade de tornozelo</span><span class="wsets">10 cada</span></div><div class="wr"><span class="wex">Ponte de glúteo no chão</span><span class="wsets">2×15</span></div></div></div>
+    <div class="sh">Pernas + Funcional</div>
+    <div class="exlist" id="lst-4">
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Agachamento livre</div><div class="exno">Maior músculo, mais queima — vai pesado</div></div><div class="exbdg">4×8</div></div>
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Leg press 45°</div><div class="exno">Pés altos ativa mais glúteo</div></div><div class="exbdg">3×12</div></div>
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Stiff com halteres</div><div class="exno">Isquiotibiais + glúteo — postura</div></div><div class="exbdg">3×10</div></div>
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Avanço com halteres</div><div class="exno">Ativa core e equilíbrio</div></div><div class="exbdg">3×12</div></div>
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Panturrilha em pé</div></div><div class="exbdg">3×15</div></div>
+      <div class="exc" onclick="togEx(this,'4')"><div class="exi"><div class="exn">Farmer walk</div><div class="exno">Core, grip e queima — 40m/série</div></div><div class="exbdg">3×40m</div></div>
+    </div>
+    <div class="tip"><strong>Agachamento abre:</strong> sem terra hoje, vai pesado no agacha.</div>
+    <button class="day-complete-btn locked" id="btn-4" onclick="completeDay(4)">Complete todos os exercícios primeiro</button>
+  </div>
+
+  <!-- SÁB -->
+  <div class="day" id="day-5">
+    <div class="dhero"><div class="dtag to">descanso</div><div class="dname">Sábado</div><div class="ddesc">Recuperação ativa</div></div>
+    <div class="rest"><div class="ri">🛌</div><div class="rtt">Descanso</div><div class="rtx">Caminhada leve de 30–40 min. Descanso é parte do treino.</div></div>
+  </div>
+  <!-- DOM -->
+  <div class="day" id="day-6">
+    <div class="dhero"><div class="dtag to">descanso</div><div class="dname">Domingo</div><div class="ddesc">O shape é construído aqui</div></div>
+    <div class="rest"><div class="ri">⚡</div><div class="rtt">Recuperação Total</div><div class="rtx">Durma bem, coma proteína e deixe o corpo reconstruir.</div></div>
+  </div>
+
+  </div><!-- pb -->
+</div><!-- scr-treino -->
+
+<!-- ========== NÍVEL ========== -->
+<div class="scr" id="scr-nivel">
+  <div class="level-hero">
+    <div class="level-big-badge" id="lvl-big-num">1</div>
+    <div class="level-big-name" id="lvl-big-name">Iniciante</div>
+    <div class="level-big-sub" id="lvl-big-sub">Continue treinando para evoluir</div>
+    <div class="level-xp-wrap">
+      <div class="level-xp-labels"><span id="lvl-xp-cur">0 XP</span><span id="lvl-xp-nxt">1000 XP</span></div>
+      <div class="level-xp-track"><div class="level-xp-fill" id="lvl-xp-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- Calendar streak -->
+  <div class="cal-section">
+    <div class="cal-header">
+      <div class="cal-title">Ofensiva — últimas semanas</div>
+      <div class="cal-streak">🔥 <span id="cal-streak">0</span><span class="cal-streak-lbl">dias</span></div>
+    </div>
+    <div class="cal-grid" id="cal-grid">
+      <div class="cal-day-lbl">S</div><div class="cal-day-lbl">T</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">Q</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">S</div><div class="cal-day-lbl">D</div>
+    </div>
+  </div>
+
+  <!-- Level progression -->
+  <div class="levels-list" id="levels-list"></div>
+</div>
+
+<!-- ========== DIETA ========== -->
+<div class="scr" id="scr-dieta">
+  <div class="pb">
+    <div class="nhero"><div class="ntag">comida de verdade</div><div class="ntitle">Plano Alimentar</div><div class="nsub">Simples · sem suplemento · o que tem em casa</div></div>
+    <div class="mstrip">
+      <div class="mc"><div class="mv">2400</div><div class="ml">kcal/dia</div></div>
+      <div class="mc"><div class="mv">180g</div><div class="ml">proteína</div></div>
+      <div class="mc"><div class="mv">220g</div><div class="ml">carbo</div></div>
+      <div class="mc"><div class="mv">70g</div><div class="ml">gordura</div></div>
+    </div>
+    <div class="dtr">
+      <div class="dtg active" onclick="switchMeal(this,'tp')">Dia treino</div>
+      <div class="dtg" onclick="switchMeal(this,'hi')">HIIT/Core</div>
+      <div class="dtg" onclick="switchMeal(this,'ds')">Descanso</div>
+    </div>
+    <div class="mplan active" id="meal-tp">
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">07:00 · café da manhã</div><div class="mname">Café completo</div></div><div><div class="mkcal">500</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Ovos mexidos ou estrelados</div><div class="mqty">3 und</div></div><div class="mrow"><div class="mfood">Pão integral</div><div class="mqty">2 fatias</div></div><div class="mrow"><div class="mfood">Banana ou fruta</div><div class="mqty">1 und</div></div><div class="mrow"><div class="mfood">Café preto</div><div class="mqty">sem açúcar</div></div></div><div class="mmac"><div class="mm">Prot <span>28g</span></div><div class="mm">Carbo <span>62g</span></div><div class="mm">Gord <span>16g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">10:00 · lanche</div><div class="mname">Lanche rápido</div></div><div><div class="mkcal">260</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Iogurte natural</div><div class="mqty">200g</div></div><div class="mrow"><div class="mfood">Amendoim ou castanha</div><div class="mqty">30g</div></div></div><div class="mmac"><div class="mm">Prot <span>16g</span></div><div class="mm">Carbo <span>20g</span></div><div class="mm">Gord <span>14g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">13:00 · almoço</div><div class="mname">Almoço completo</div></div><div><div class="mkcal">700</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Frango grelhado ou assado</div><div class="mqty">200g</div></div><div class="mrow"><div class="mfood">Arroz branco ou integral</div><div class="mqty">4 col sopa</div></div><div class="mrow"><div class="mfood">Feijão ou lentilha</div><div class="mqty">concha cheia</div></div><div class="mrow"><div class="mfood">Salada + legumes</div><div class="mqty">à vontade</div></div><div class="mrow"><div class="mfood">Azeite</div><div class="mqty">1 fio</div></div></div><div class="mmac"><div class="mm">Prot <span>52g</span></div><div class="mm">Carbo <span>78g</span></div><div class="mm">Gord <span>16g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">16:00 · pré/pós-treino</div><div class="mname">Lanche de força</div></div><div><div class="mkcal">340</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Ovos cozidos</div><div class="mqty">3 und</div></div><div class="mrow"><div class="mfood">Banana</div><div class="mqty">1 und</div></div><div class="mrow"><div class="mfood">Pão integral</div><div class="mqty">1 fatia</div></div></div><div class="mmac"><div class="mm">Prot <span>26g</span></div><div class="mm">Carbo <span>42g</span></div><div class="mm">Gord <span>10g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">20:00 · jantar</div><div class="mname">Jantar</div></div><div><div class="mkcal">600</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Carne magra ou atum</div><div class="mqty">200g / 2 latas</div></div><div class="mrow"><div class="mfood">Arroz ou mandioca</div><div class="mqty">3 col sopa</div></div><div class="mrow"><div class="mfood">Feijão</div><div class="mqty">meia concha</div></div><div class="mrow"><div class="mfood">Salada verde</div><div class="mqty">à vontade</div></div></div><div class="mmac"><div class="mm">Prot <span>52g</span></div><div class="mm">Carbo <span>44g</span></div><div class="mm">Gord <span>18g</span></div></div></div>
+    </div>
+    <div class="mplan" id="meal-hi">
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">08:00 · café</div><div class="mname">Café leve</div></div><div><div class="mkcal">420</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Ovos mexidos</div><div class="mqty">4 und</div></div><div class="mrow"><div class="mfood">Pão integral</div><div class="mqty">1 fatia</div></div><div class="mrow"><div class="mfood">Café preto</div><div class="mqty">sem açúcar</div></div></div><div class="mmac"><div class="mm">Prot <span>30g</span></div><div class="mm">Carbo <span>20g</span></div><div class="mm">Gord <span>20g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">13:00 · almoço low-carb</div><div class="mname">Almoço proteico</div></div><div><div class="mkcal">580</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Frango ou atum</div><div class="mqty">220g / 2 latas</div></div><div class="mrow"><div class="mfood">Ovos cozidos</div><div class="mqty">2 und</div></div><div class="mrow"><div class="mfood">Arroz</div><div class="mqty">2 col sopa</div></div><div class="mrow"><div class="mfood">Legumes e salada</div><div class="mqty">à vontade</div></div></div><div class="mmac"><div class="mm">Prot <span>58g</span></div><div class="mm">Carbo <span>28g</span></div><div class="mm">Gord <span>18g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">19:30 · jantar</div><div class="mname">Jantar proteico</div></div><div><div class="mkcal">480</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Atum ou sardinha</div><div class="mqty">2 latas</div></div><div class="mrow"><div class="mfood">Ovos cozidos</div><div class="mqty">2 und</div></div><div class="mrow"><div class="mfood">Feijão ou grão-de-bico</div><div class="mqty">meia concha</div></div><div class="mrow"><div class="mfood">Salada à vontade</div><div class="mqty">tomate, alface, pepino</div></div></div><div class="mmac"><div class="mm">Prot <span>54g</span></div><div class="mm">Carbo <span>22g</span></div><div class="mm">Gord <span>16g</span></div></div></div>
+    </div>
+    <div class="mplan" id="meal-ds">
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">09:00 · café</div><div class="mname">Café reforçado</div></div><div><div class="mkcal">460</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Ovos mexidos ou fritos</div><div class="mqty">3 und</div></div><div class="mrow"><div class="mfood">Queijo minas ou requeijão</div><div class="mqty">1 fatia</div></div><div class="mrow"><div class="mfood">Pão integral</div><div class="mqty">1 fatia</div></div><div class="mrow"><div class="mfood">Fruta</div><div class="mqty">1 und</div></div></div><div class="mmac"><div class="mm">Prot <span>30g</span></div><div class="mm">Carbo <span>30g</span></div><div class="mm">Gord <span>22g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">13:00 · almoço</div><div class="mname">Almoço completo</div></div><div><div class="mkcal">650</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Frango, peixe ou carne</div><div class="mqty">220g</div></div><div class="mrow"><div class="mfood">Arroz</div><div class="mqty">4 col sopa</div></div><div class="mrow"><div class="mfood">Feijão</div><div class="mqty">concha cheia</div></div><div class="mrow"><div class="mfood">Legumes e verduras</div><div class="mqty">à vontade</div></div></div><div class="mmac"><div class="mm">Prot <span>52g</span></div><div class="mm">Carbo <span>70g</span></div><div class="mm">Gord <span>14g</span></div></div></div>
+      <div class="mcard"><div class="mhdr"><div><div class="mtime">19:00 · jantar leve</div><div class="mname">Jantar</div></div><div><div class="mkcal">400</div><div class="mkcall">kcal</div></div></div><div class="mbody"><div class="mrow"><div class="mfood">Ovos mexidos ou omelete</div><div class="mqty">4 und</div></div><div class="mrow"><div class="mfood">Legumes refogados</div><div class="mqty">200g</div></div><div class="mrow"><div class="mfood">Sem arroz — dia de descanso</div><div class="mqty">—</div></div></div><div class="mmac"><div class="mm">Prot <span>32g</span></div><div class="mm">Carbo <span>12g</span></div><div class="mm">Gord <span>20g</span></div></div></div>
+    </div>
+    <div class="sh" style="margin-top:10px;">Água do dia</div>
+    <div class="ww"><div class="wcard"><div class="wtop"><div><div class="wtitle">Hidratação</div><div class="wsub">Meta: 3,5 L / 14 copos</div></div><div><div class="wnum" id="wNum">0</div><div class="wgoal">/ 14 copos</div></div></div><div class="wcups" id="wCups"></div><div class="wbar2"><div class="wfill" id="wFill" style="width:0%"></div></div></div></div>
+    <div class="sh" style="margin-top:14px;">Evitar sempre</div>
+    <div class="avg"><div class="acard"><div class="aname">Álcool</div><div class="awhy">Cortisol e gordura visceral</div></div><div class="acard"><div class="aname">Açúcar simples</div><div class="awhy">Pico de insulina no core</div></div><div class="acard"><div class="aname">Ultra-processados</div><div class="awhy">Inflamação e retenção</div></div><div class="acard"><div class="aname">Carbo à noite</div><div class="awhy">Exceto pós-treino noturno</div></div><div class="acard"><div class="aname">Frituras</div><div class="awhy">Gordura trans — pior pra queima</div></div><div class="acard"><div class="aname">Refrigerante</div><div class="awhy">Zero também atrapalha</div></div></div>
+    <div class="sh" style="margin-top:14px;">Regras simples</div>
+    <div class="slist"><div class="scard"><div><div class="sname">Ovo é seu whey</div><div class="swhen">3–5 ovos/dia cobrem boa parte da proteína</div></div><div class="sdose">✓</div></div><div class="scard"><div><div class="sname">Atum e sardinha</div><div class="swhen">Proteína barata, rápida e com ômega 3</div></div><div class="sdose">✓</div></div><div class="scard"><div><div class="sname">Feijão todo dia</div><div class="swhen">Proteína vegetal + fibra + saciedade</div></div><div class="sdose">✓</div></div><div class="scard"><div><div class="sname">Arroz no almoço</div><div class="swhen">Corta à noite nos dias de descanso</div></div><div class="sdose">✓</div></div><div class="scard"><div><div class="sname">Frango é base</div><div class="swhen">Mais barato e versátil — asse ou grelhe</div></div><div class="sdose">✓</div></div></div>
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
+<script>
+// ===== LEVELS =====
+var LEVELS = [
+  {n:1, name:'Iniciante',      sub:'Começando a jornada',         xp:0},
+  {n:2, name:'Guerreiro',      sub:'Consistência se formando',    xp:1000},
+  {n:3, name:'Combatente',     sub:'Força real aparecendo',       xp:2000},
+  {n:4, name:'Lutador',        sub:'Shape tomando forma',         xp:3000},
+  {n:5, name:'Assassino',      sub:'Core definindo',              xp:4000},
+  {n:6, name:'Caçador',        sub:'V-taper visível',             xp:5000},
+  {n:7, name:'Elite',          sub:'Corpo de atleta',             xp:6000},
+  {n:8, name:'Mestre',         sub:'Domínio total',               xp:7000},
+  {n:9, name:'Lenda',          sub:'Nível Toji atingido',         xp:8000},
+  {n:10,name:'TOJI',           sub:'Você é o Caçador',            xp:9000},
+];
+var XP_PER_DAY = 200;
+var XP_PER_LEVEL = 1000;
+
+// ===== STORAGE =====
+function load(k, def) { try { var v=localStorage.getItem(k); return v!==null?JSON.parse(v):def; } catch(e){return def;} }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+
+// STATE
+var state = load('toji_state', {
+  xp: 0,
+  streak: 0,
+  lastTrainDate: null,
+  completedDays: {},   // "YYYY-MM-DD_dayIdx": true
+  exState: {},          // "dayIdx_exIdx": true
+  water: 0,
+  waterDate: null,
+});
+
+var curDay = 0;
+
+function todayStr() {
+  var d = new Date();
+  return d.getFullYear()+'-'+(d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
+}
+
+function dayKey(dayIdx) { return todayStr()+'_'+dayIdx; }
+
+function getLvl(xp) {
+  var lvl = LEVELS[0];
+  for (var i=0; i<LEVELS.length; i++) { if (xp >= LEVELS[i].xp) lvl = LEVELS[i]; }
+  return lvl;
+}
+
+function getNextLvlXp(xp) {
+  for (var i=0; i<LEVELS.length; i++) { if (LEVELS[i].xp > xp) return LEVELS[i].xp; }
+  return LEVELS[LEVELS.length-1].xp + XP_PER_LEVEL;
+}
+
+// ===== RENDER XP =====
+function renderXP() {
+  var xp = state.xp < 0 ? 0 : state.xp;
+  var lvl = getLvl(xp);
+  var nextXp = getNextLvlXp(xp);
+  var prevXp = lvl.xp;
+  var pct = Math.min(100, Math.round((xp - prevXp) / (nextXp - prevXp) * 100));
+
+  document.getElementById('xp-badge-num').textContent = lvl.n;
+  document.getElementById('xp-lvl-txt').textContent = 'Nível '+lvl.n;
+  document.getElementById('xp-lvl-name').textContent = lvl.name;
+  document.getElementById('xp-cur').textContent = xp;
+  document.getElementById('xp-nxt').textContent = nextXp;
+  document.getElementById('xp-fill').style.width = pct+'%';
+  document.getElementById('xp-l0').textContent = prevXp;
+  document.getElementById('xp-l1').textContent = nextXp+' XP';
+  document.getElementById('streak-num').textContent = state.streak;
+
+  // week XP
+  var weekXp = 0;
+  for (var i=0; i<5; i++) { if (state.completedDays[dayKey(i)]) weekXp += XP_PER_DAY; }
+  document.getElementById('week-xp-label').textContent = 'Esta semana: '+weekXp+' XP';
+
+  // week day checkmarks
+  for (var j=0; j<5; j++) {
+    document.getElementById('wdd-'+j).textContent = state.completedDays[dayKey(j)] ? '✓' : '';
+  }
+
+  // level screen
+  document.getElementById('lvl-big-num').textContent = lvl.n;
+  document.getElementById('lvl-big-name').textContent = lvl.name;
+  document.getElementById('lvl-big-sub').textContent = lvl.sub;
+  document.getElementById('lvl-xp-cur').textContent = xp+' XP';
+  document.getElementById('lvl-xp-nxt').textContent = nextXp+' XP';
+  document.getElementById('lvl-xp-fill').style.width = pct+'%';
+  document.getElementById('cal-streak').textContent = state.streak;
+
+  renderLevelsList(lvl.n);
+  renderCalendar();
+}
+
+function renderLevelsList(curLvlN) {
+  var el = document.getElementById('levels-list');
+  el.innerHTML = '';
+  LEVELS.forEach(function(lv) {
+    var done = curLvlN > lv.n;
+    var curr = curLvlN === lv.n;
+    var locked = curLvlN < lv.n;
+    var row = document.createElement('div');
+    row.className = 'lvl-row' + (curr?' current':'') + (locked?' unlocked':'');
+    var iconClass = done?'done':curr?'curr':'lock';
+    var tagClass = done?'done-tag':curr?'curr-tag':'lock-tag';
+    var tagTxt = done?'✓ completo':curr?'atual':'🔒 bloqueado';
+    row.innerHTML = '<div class="lvl-icon '+iconClass+'">'+lv.n+'</div><div class="lvl-info"><div class="lvl-name">'+lv.name+'</div><div class="lvl-xp">'+lv.xp+' XP · '+lv.sub+'</div></div><div class="lvl-tag '+tagClass+'">'+tagTxt+'</div>';
+    el.appendChild(row);
+  });
+}
+
+function renderCalendar() {
+  var grid = document.getElementById('cal-grid');
+  // Keep header labels (first 7 children)
+  while (grid.children.length > 7) grid.removeChild(grid.lastChild);
+
+  var today = new Date();
+  // Show last 4 weeks + current week = 5 weeks, start from Monday 5 weeks ago
+  var startDate = new Date(today);
+  var dow = startDate.getDay(); // 0=Sun
+  // Go to last Monday
+  var diffToMon = (dow === 0) ? 6 : dow - 1;
+  startDate.setDate(startDate.getDate() - diffToMon - 28); // 4 extra weeks back
+
+  var TRAIN_DAYS = [1,2,3,4,5]; // Mon-Fri (JS: 1=Mon)
+
+  for (var i=0; i<35; i++) {
+    var d = new Date(startDate);
+    d.setDate(startDate.getDate()+i);
+    var dStr = d.getFullYear()+'-'+(d.getMonth()+1<10?'0':'')+(d.getMonth()+1)+'-'+(d.getDate()<10?'0':'')+d.getDate();
+    var isToday = dStr === todayStr();
+    var isFuture = d > today;
+    var dow2 = d.getDay() === 0 ? 7 : d.getDay(); // 1=Mon 7=Sun
+    var isTrainDay = TRAIN_DAYS.indexOf(d.getDay()) !== -1;
+
+    var cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    if (isToday) cell.classList.add('today');
+
+    if (isFuture) {
+      cell.classList.add('future');
+      cell.textContent = d.getDate();
+    } else if (!isTrainDay) {
+      cell.classList.add('rest');
+      cell.textContent = d.getDate();
+    } else {
+      // Check if any training day was completed for this date
+      var anyDone = false;
+      for (var di=0; di<5; di++) {
+        if (state.completedDays[dStr+'_'+di]) { anyDone = true; break; }
+      }
+      if (anyDone) {
+        cell.classList.add('done');
+        cell.textContent = '✓';
+      } else {
+        cell.classList.add('missed');
+        cell.textContent = d.getDate();
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ===== EXERCISE TOGGLE =====
+function togEx(card, dayStr) {
+  var dayIdx = parseInt(dayStr);
+  var lst = document.getElementById('lst-'+dayStr);
+  var cards = lst.querySelectorAll('.exc');
+  var idx = Array.prototype.indexOf.call(cards, card);
+  var key = dayStr+'_'+idx;
+
+  card.classList.toggle('done');
+  if (card.classList.contains('done')) {
+    state.exState[key] = true;
+  } else {
+    delete state.exState[key];
+  }
+  save('toji_state', state);
+  updateDayProgress(dayStr);
+}
+
+function updateDayProgress(dayStr) {
+  var lst = document.getElementById('lst-'+dayStr);
+  if (!lst) return;
+  var cards = lst.querySelectorAll('.exc');
+  var done = lst.querySelectorAll('.exc.done').length;
+  var total = cards.length;
+  var pct = total > 0 ? Math.round(done/total*100) : 0;
+  document.getElementById('pf-'+dayStr).style.width = pct+'%';
+  document.getElementById('pr-'+dayStr).textContent = done+'/'+total;
+
+  var btn = document.getElementById('btn-'+dayStr);
+  if (!btn) return;
+  var alreadyDone = state.completedDays[dayKey(parseInt(dayStr))];
+  if (alreadyDone) {
+    btn.className = 'day-complete-btn completed';
+    btn.textContent = '✓ Treino concluído — +200 XP';
+  } else if (done === total) {
+    btn.className = 'day-complete-btn ready';
+    btn.textContent = '✅ Concluir treino e ganhar +200 XP';
+  } else {
+    btn.className = 'day-complete-btn locked';
+    btn.textContent = 'Complete todos os exercícios primeiro ('+done+'/'+total+')';
+  }
+}
+
+function completeDay(dayIdx) {
+  var key = dayKey(dayIdx);
+  if (state.completedDays[key]) return;
+  var lst = document.getElementById('lst-'+dayIdx);
+  if (!lst) return;
+  var done = lst.querySelectorAll('.exc.done').length;
+  var total = lst.querySelectorAll('.exc').length;
+  if (done < total) return;
+
+  state.completedDays[key] = true;
+
+  // XP
+  var prevXp = state.xp;
+  state.xp = (state.xp || 0) + XP_PER_DAY;
+
+  // Streak: check if yesterday had a workout
+  updateStreak();
+
+  save('toji_state', state);
+  renderXP();
+  updateDayProgress(dayIdx+'');
+
+  // Level up check
+  var prevLvl = getLvl(prevXp);
+  var newLvl = getLvl(state.xp);
+  if (newLvl.n > prevLvl.n) {
+    showToast('🏆 LEVEL UP! Nível '+newLvl.n+' — '+newLvl.name+'!', false);
+  } else {
+    showToast('+200 XP! 💪 Treino concluído!', false);
+  }
+}
+
+function updateStreak() {
+  var today = new Date();
+  var todayS = todayStr();
+  if (state.lastTrainDate === todayS) return;
+  if (state.lastTrainDate) {
+    var last = new Date(state.lastTrainDate);
+    var diff = Math.round((today - last) / 86400000);
+    if (diff === 1) { state.streak = (state.streak||0) + 1; }
+    else if (diff > 1) { state.streak = 1; }
+    else { state.streak = (state.streak||1); }
+  } else {
+    state.streak = 1;
+  }
+  state.lastTrainDate = todayS;
+}
+
+// ===== INIT EXERCISES =====
+function initExercises() {
+  for (var d=0; d<5; d++) {
+    var lst = document.getElementById('lst-'+d);
+    if (!lst) continue;
+    var cards = lst.querySelectorAll('.exc');
+    cards.forEach(function(card, idx) {
+      var key = d+'_'+idx;
+      if (state.exState[key]) card.classList.add('done');
+    });
+    updateDayProgress(d+'');
+  }
+}
+
+// ===== NAV =====
+function goTab(t) {
+  document.querySelectorAll('.scr').forEach(function(e){e.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(e){e.classList.remove('active');});
+  document.getElementById('scr-'+t).classList.add('active');
+  var tabs = document.querySelectorAll('.nav-tab');
+  var map = {treino:0, nivel:1, dieta:2};
+  tabs[map[t]].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function selDay(n) {
+  document.querySelectorAll('.day').forEach(function(e){e.classList.remove('active');});
+  document.querySelectorAll('.wd').forEach(function(e){e.classList.remove('active');});
+  document.getElementById('day-'+n).classList.add('active');
+  document.getElementById('wd-'+n).classList.add('active');
+  curDay = n;
+}
+
+function togWarm(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+// ===== TOAST =====
+function showToast(msg, bad) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (bad?' bad':'');
+  setTimeout(function(){ t.classList.add('show'); }, 10);
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// ===== MEAL =====
+function switchMeal(el, id) {
+  document.querySelectorAll('.mplan').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.dtg').forEach(function(d){d.classList.remove('active');});
+  document.getElementById('meal-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ===== WATER =====
+var wCount = load('toji_water', 0);
+var wDate = load('toji_water_date', null);
+if (wDate !== todayStr()) { wCount = 0; save('toji_water', 0); save('toji_water_date', todayStr()); }
+
+function buildWater() {
+  var c = document.getElementById('wCups');
+  c.innerHTML = '';
+  for (var i=0; i<14; i++) {
+    var d = document.createElement('div');
+    d.className = 'wcup'+(i<wCount?' filled':'');
+    d.textContent = '💧';
+    (function(idx){ d.onclick = function(){
+      wCount = idx < wCount ? idx : idx+1;
+      save('toji_water', wCount);
+      save('toji_water_date', todayStr());
+      buildWater();
+    };})(i);
+    c.appendChild(d);
+  }
+  document.getElementById('wNum').textContent = wCount;
+  document.getElementById('wFill').style.width = Math.round(wCount/14*100)+'%';
+}
+
+// ===== PWA SETUP (APP INSTALÁVEL) =====
+(function initPWA() {
+  var manifest = {
+    name: "Treino Toji",
+    short_name: "Toji",
+    description: "App de Treino e Dieta inspirado no Toji Fushiguro",
+    start_url: window.location.href.split('?')[0].split('#')[0],
+    display: "standalone",
+    background_color: "#0a0a0a",
+    theme_color: "#c8a96e",
+    icons: [{
+      src: "https://i.pinimg.com/736x/2b/4f/17/2b4f1799b441e05254a12d6e56c9e1ad.jpg",
+      sizes: "512x512",
+      type: "image/jpeg",
+      purpose: "any maskable"
+    }]
+  };
+  var link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+  document.head.appendChild(link);
+})();
+
+// ===== BOOT =====
+initExercises();
+renderXP();
+buildWater();
+</script>
+</body>
+</html>
